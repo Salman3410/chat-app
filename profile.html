@@ -1,97 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Friend Profile</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bungee&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="profile.css" />
-  </head>
-  <body>
-    <div id="loader" class="loader">
-      <div class="spinner"></div>
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
+  <title>3Chat — Profile</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="profile.css"
+  />
+
+</head>
+
+
+<body>
+
+  <!-- ==========================================
+       BACKGROUND
+  =========================================== -->
+
+  <div
+    class="background-grid"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="background-glow glow-pink"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="background-glow glow-cyan"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- ==========================================
+       LOADER
+  =========================================== -->
+
+  <div
+    id="loader"
+    class="loader"
+    aria-hidden="true"
+  >
+
+    <div class="loader-box">
+
+      <div
+        class="spinner"
+        aria-hidden="true"
+      ></div>
+
+      <span>
+        Loading profile...
+      </span>
+
     </div>
 
-    <header>
-      <button class="back-btn" onclick="goBack()">⬅ Back to Home</button>
-      ⚡ Profile Page ⚡
-      <span id="usernameDisplay"></span>
-      <button class="send-msg-btn" onclick="sendMessageToFriend('Sam')">
-        💬 Send Message
-      </button>
-    </header>
+  </div>
 
-    <div class="profile-card" id="profile"></div>
 
-    <script>
-      const loggedInUser = localStorage.getItem("loggedInUser");
-      const usernameDisplay = document.getElementById("usernameDisplay");
+  <!-- ==========================================
+       HEADER
+  =========================================== -->
 
-      if (!loggedInUser) window.location.href = "login.html";
-      else {
-        usernameDisplay.innerText = `👤 ${loggedInUser}`;
-        usernameDisplay.style.marginLeft = "15px";
-        usernameDisplay.style.fontWeight = "bold";
-      }
+  <header class="topbar">
 
-      function goBack() {
-        window.location.href = "index.html";
-      }
+    <button
+      id="backBtn"
+      class="back-btn"
+      type="button"
+      aria-label="Go back to home"
+    >
 
-      const params = new URLSearchParams(window.location.search);
-      const name = params.get("name");
+      <span aria-hidden="true">
+        ←
+      </span>
 
-      const profileBox = document.getElementById("profile");
-      const profiles = {
-        Sam: {
-          emoji: "🐧",
-          role: "Graphic Designer",
-          bio: "Loves designing the World",
-          hobbies: "Gaming, Cybersecurity, Graphic designing",
-          skills: "JS, Adobe PS, React Native",
-          avatar: "avatars/Sam.png",
-        },
-        Abcd: {
-          emoji: "🦸",
-          role: "Problem Solver",
-          bio: "Solves impossible bugs.",
-          hobbies: "Problem Solving",
-          skills: "Creative Thinking",
-          // avatar: "avatars/mohsin.png",
-        },
-        Efgh: {
-          emoji: "🤖",
-          role: "Childish",
-          bio: "Childness",
-          hobbies: "Eating, Playing",
-          skills: "Pizza, Cotton Candy, Kinder Joy",
-          // avatar: "avatars/Arsh.jpeg",
-        },
-      };
+      <span>
+        Home
+      </span>
 
-      if (profiles[name]) {
-        const p = profiles[name];
-        profileBox.innerHTML = `
-        <img src="${p.avatar}" alt="${name}" class="profile-avatar">
-        <h1>${p.emoji} ${name}</h1>
-        <p><strong>${p.role}</strong></p>
-        <p>${p.bio}</p>
-        <p>${p.hobbies}</p>
-        <p>${p.skills}</p>
-      `;
-      } else profileBox.innerHTML = "<h1>Profile not found ❌</h1>";
-    </script>
+    </button>
 
-    <script>
-      function sendMessageToFriend(friendName) {
-        // Save the selected friend in localStorage
-        localStorage.setItem("currentChatFriend", friendName);
 
-        // Go to chat page
-        window.location.href = "chat.html";
-      }
-    </script>
-  </body>
+    <div class="topbar-title">
+
+      <span
+        class="topbar-dot"
+        aria-hidden="true"
+      ></span>
+
+      <span>
+        3Chat
+      </span>
+
+    </div>
+
+
+    <div
+      id="usernameDisplay"
+      class="logged-user"
+      aria-label="Logged in user"
+    ></div>
+
+  </header>
+
+
+  <!-- ==========================================
+       PROFILE
+  =========================================== -->
+
+  <main class="profile-page">
+
+    <section
+      id="profile"
+      class="profile-card"
+      aria-live="polite"
+    ></section>
+
+  </main>
+
+
+  <!-- ==========================================
+       JAVASCRIPT
+  =========================================== -->
+
+  <script
+    type="module"
+    src="profile.js"
+  ></script>
+
+</body>
+
 </html>

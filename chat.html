@@ -1,57 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>⚡ Funky Chat</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bungee&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="chat.css" />
-  </head>
-  <body>
-    <!-- Loader -->
-    <div id="loader" class="loader">
-      <div class="spinner"></div>
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
+  <title>3Chat — Conversation</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="chat.css"
+  />
+
+</head>
+
+
+<body>
+
+  <!-- ==========================================
+       BACKGROUND
+  =========================================== -->
+
+  <div
+    class="background-grid"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="background-glow glow-pink"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="background-glow glow-cyan"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- ==========================================
+       LOADER
+  =========================================== -->
+
+  <div
+    id="loader"
+    class="loader"
+    aria-hidden="true"
+  >
+
+    <div class="loader-box">
+
+      <div
+        class="spinner"
+        aria-hidden="true"
+      ></div>
+
+      <span>
+        Loading conversation...
+      </span>
+
     </div>
 
-    <!-- Header -->
-    <header>
-      <button class="back-btn" onclick="goBack()">⬅ Back</button>
-      ⚡ Funky Chat ⚡
-      <span id="usernameDisplay"></span>
-      <label for="bg-upload" class="custom-upload-btn"
-        >📁 Choose Background:</label
+  </div>
+
+
+  <!-- ==========================================
+       HEADER
+  =========================================== -->
+
+  <header class="chat-header">
+
+    <!-- Back -->
+
+    <button
+      id="backBtn"
+      class="header-btn back-btn"
+      type="button"
+      aria-label="Back to home"
+    >
+
+      <span aria-hidden="true">
+        ←
+      </span>
+
+      <span class="desktop-label">
+        Home
+      </span>
+
+    </button>
+
+
+    <!-- Chat title -->
+
+    <div class="chat-title">
+
+      <div
+        class="chat-title-icon"
+        aria-hidden="true"
       >
+        💬
+      </div>
+
+      <div>
+
+        <h1>
+          3Chat
+        </h1>
+
+        <span>
+          3 legends • 1 conversation
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- Header actions -->
+
+    <div class="header-actions">
+
+      <span
+        id="usernameDisplay"
+        class="user-chip"
+      ></span>
+
+
+      <button
+        id="modeToggle"
+        class="icon-btn"
+        type="button"
+        aria-label="Toggle light and dark mode"
+        title="Toggle theme"
+      >
+        ☀️
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ==========================================
+       NOTIFICATIONS
+  =========================================== -->
+
+  <div
+    id="notification-container"
+    class="notification-container"
+    aria-live="polite"
+  ></div>
+
+
+  <!-- ==========================================
+       CHAT
+  =========================================== -->
+
+  <main
+    id="chat-container"
+    class="chat-container"
+    aria-label="3Chat messages"
+  ></main>
+
+
+  <!-- ==========================================
+       MESSAGE COMPOSER
+  =========================================== -->
+
+  <form
+    id="chatForm"
+    class="chat-input"
+  >
+
+    <div class="input-shell">
+
       <input
-        type="file"
-        id="bg-upload"
-        accept="image/*"
-        style="display: none"
+        type="text"
+        id="messageInput"
+        placeholder="Type something chaotic..."
+        autocomplete="off"
+        maxlength="1000"
+        aria-label="Message"
       />
-    </header>
 
-    <!-- Notifications -->
-    <div id="notification-container"></div>
+      <span
+        id="characterCount"
+        class="character-count"
+      >
+        0/1000
+      </span>
 
-    <!-- Chat container -->
-    <div class="chat-container" id="chat-container"></div>
-
-    <!-- Typing indicator -->
-    <div id="typing-indicator" class="typing-indicator">
-      Friend is typing...
     </div>
 
-    <!-- Input controls -->
-    <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type a message..." />
-      <button id="sendBtn">Send</button>
-    </div>
 
-    <!-- Back button fixed at bottom for mobile -->
-    <button class="mobile-back-btn" onclick="goBack()">⬅ Back</button>
+    <button
+      id="sendBtn"
+      class="send-btn"
+      type="submit"
+      aria-label="Send message"
+    >
 
-    <script type="module" src="chat.js"></script>
-  </body>
+      <span class="send-text">
+        Send
+      </span>
+
+      <span
+        class="send-icon"
+        aria-hidden="true"
+      >
+        ↑
+      </span>
+
+    </button>
+
+  </form>
+
+
+  <!-- ==========================================
+       MOBILE / DESKTOP HINT
+  =========================================== -->
+
+  <div class="chat-hint">
+    Press Enter to send
+  </div>
+
+
+  <!-- ==========================================
+       JAVASCRIPT
+  =========================================== -->
+
+  <script
+    type="module"
+    src="chat.js"
+  ></script>
+
+</body>
+
 </html>

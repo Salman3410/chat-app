@@ -1,7 +1,9 @@
-// =================== IMPORTS ===================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
-  getFirestore,
+  onAuthStateChanged,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+import {
   collection,
   addDoc,
   onSnapshot,
@@ -13,222 +15,670 @@ import {
   serverTimestamp,
   getDoc,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
-// =================== FIREBASE CONFIG ===================
-const firebaseConfig = {
-  apiKey: "AIzaSyD0mDWg5NLpS1X1TrJ09QSZwTbV8rOdLpI",
-  authDomain: "chat-app-cc84a.firebaseapp.com",
-  projectId: "chat-app-cc84a",
-  storageBucket: "chat-app-cc84a.firebasestorage.app",
-  messagingSenderId: "188306449397",
-  appId: "1:188306449397:web:e23bc1ca9a1db3dcbeb6bc",
-  measurementId: "G-PR6YGH0LLL",
-};
+import { auth, db } from "./firebase/firebaseConfig.js";
 
-// =================== INIT ===================
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const CHAT_ID = "group_3chat";
 
-// =================== DOM ELEMENTS ===================
+const loader = document.getElementById("loader");
+const backBtn = document.getElementById("backBtn");
+const modeToggle = document.getElementById("modeToggle");
+const usernameDisplay = document.getElementById("usernameDisplay");
+
 const chatContainer = document.getElementById("chat-container");
+
+const chatForm = document.getElementById("chatForm");
 const messageInput = document.getElementById("messageInput");
-const notificationContainer = document.getElementById("notification-container");
-const bgUploadInput = document.getElementById("bg-upload");
+const characterCount = document.getElementById("characterCount");
 const sendBtn = document.getElementById("sendBtn");
+const sendText = document.querySelector(".send-text");
+const sendIcon = document.querySelector(".send-icon");
 
-// =================== CURRENT USER ===================
-const loggedInUser = localStorage.getItem("loggedInUser") || "You";
+const notificationContainer = document.getElementById("notification-container");
 
-// =================== USER COLORS ===================
-const userColors = {
-  Sam: "#FF69B4",
-  Basa: "#00FF7F",
-  Biya: "#FFD700",
-  [loggedInUser]: "#FFFF00",
-};
+let currentUser = null;
+let currentUserData = null;
 
-// =================== NOTIFICATION SOUND ===================
-const pingSound = new Audio("sounds/ping.mp3");
+let firstSnapshot = true;
 
-// =================== SEND MESSAGE ===================
-async function sendMessage() {
-  const text = messageInput.value.trim();
-  if (!text) return;
-  sendBtn.disabled = true;
+const messageElements = new Map();
 
-  await addDoc(collection(db, "messages"), {
-    sender: loggedInUser,
-    text: text,
-    timestamp: serverTimestamp(),
-  });
+let editingMessageId = null;
+let editingOriginalText = "";
 
-  messageInput.value = "";
-  sendBtn.disabled = false;
-}
-sendBtn.addEventListener("click", sendMessage);
-window.sendMessage = sendMessage;
+/* ==========================================
+   AUTH
+========================================== */
 
-// =================== EDIT & DELETE ===================
-async function editMessage(id, oldText) {
-  const newText = prompt("Edit your message:", oldText);
-  if (newText && newText.trim() !== "") {
-    await updateDoc(doc(db, "messages", id), { text: newText.trim() });
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.replace("login.html");
+    return;
+  }
+
+  currentUser = user;
+
+  try {
+    await loadCurrentUser(user);
+    await verifyChatExists();
+    startMessageListener();
+
+    hideLoader();
+  } catch (error) {
+    console.error("❌ Chat initialization failed:", error);
+
+    showNotification(error.message || "Unable to load the conversation.");
+
+    hideLoader();
+  }
+});
+
+/* ==========================================
+   LOAD CURRENT USER
+========================================== */
+
+async function loadCurrentUser(user) {
+  const userRef = doc(db, "users", user.uid);
+  const snapshot = await getDoc(userRef);
+
+  if (snapshot.exists()) {
+    currentUserData = snapshot.data();
+
+    usernameDisplay.textContent = `👤 ${
+      currentUserData.username || currentUserData.displayName || user.email
+    }`;
+  } else {
+    currentUserData = {
+      username: user.email,
+      displayName: user.email,
+    };
+
+    usernameDisplay.textContent = `👤 ${user.email}`;
   }
 }
 
-async function deleteMessage(id) {
-  if (confirm("Delete this message?")) {
-    await deleteDoc(doc(db, "messages", id));
+/* ==========================================
+   VERIFY GROUP CHAT
+========================================== */
+
+async function verifyChatExists() {
+  const chatRef = doc(db, "chats", CHAT_ID);
+  const snapshot = await getDoc(chatRef);
+
+  if (!snapshot.exists()) {
+    throw new Error("3Chat conversation was not found.");
+  }
+
+  const chatData = snapshot.data();
+
+  if (
+    !Array.isArray(chatData.participants) ||
+    !chatData.participants.includes(currentUser.uid)
+  ) {
+    throw new Error("You are not a participant in this conversation.");
   }
 }
 
-// =================== BACK BUTTON ===================
-function goBack() {
-  window.location.href = "index.html";
-}
-window.goBack = goBack;
+/* ==========================================
+   MESSAGE LISTENER
+========================================== */
 
-// =================== RENDER MESSAGE ===================
-function renderMessage(docData, id) {
-  const msgDiv = document.createElement("div");
-  msgDiv.classList.add(
-    "message",
-    docData.sender === loggedInUser ? "you" : "friend"
-  );
+function startMessageListener() {
+  const messagesRef = collection(db, "chats", CHAT_ID, "messages");
 
-  const textSpan = document.createElement("span");
-  textSpan.textContent = docData.text;
-  textSpan.style.backgroundColor = userColors[docData.sender] || "#CCCCCC";
-  textSpan.style.padding = "8px 12px";
-  textSpan.style.borderRadius = "15px";
-  textSpan.style.display = "inline-block";
-  msgDiv.appendChild(textSpan);
+  const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
 
-  const timeSpan = document.createElement("span");
-  if (docData.timestamp && docData.timestamp.toDate) {
-    const d = docData.timestamp.toDate();
-    timeSpan.textContent = ` ${d.getHours()}:${d
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
-  }
-  timeSpan.style.fontSize = "12px";
-  timeSpan.style.marginLeft = "5px";
-  msgDiv.appendChild(timeSpan);
-
-  if (docData.sender === loggedInUser) {
-    const actionsDiv = document.createElement("div");
-    actionsDiv.style.marginTop = "5px";
-
-    const editBtn = document.createElement("button");
-    editBtn.innerText = "✏️";
-    editBtn.onclick = () => editMessage(id, docData.text);
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.innerText = "🗑️";
-    deleteBtn.onclick = () => deleteMessage(id);
-
-    actionsDiv.appendChild(editBtn);
-    actionsDiv.appendChild(deleteBtn);
-    msgDiv.appendChild(document.createElement("br"));
-    msgDiv.appendChild(actionsDiv);
-  }
-
-  chatContainer.appendChild(msgDiv);
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-}
-
-// =================== LOAD MESSAGES ===================
-let lastMessageId = null;
-const messagesQuery = query(
-  collection(db, "messages"),
-  orderBy("timestamp", "asc")
-);
-
-onSnapshot(messagesQuery, (snapshot) => {
-  snapshot.docChanges().forEach((change) => {
-    if (change.type === "added") {
-      const data = change.doc.data();
-      renderMessage(data, change.doc.id);
-
-      if (change.doc.id !== lastMessageId && data.sender !== loggedInUser) {
-        pingSound.play().catch(() => {});
-        showNotification(`${data.sender}: ${data.text}`);
+  onSnapshot(
+    messagesQuery,
+    (snapshot) => {
+      if (snapshot.empty) {
+        renderEmptyChat();
       }
 
-      lastMessageId = change.doc.id;
+      snapshot.docChanges().forEach((change) => {
+        const messageId = change.doc.id;
+        const messageData = change.doc.data();
+
+        if (change.type === "added") {
+          renderMessage(messageId, messageData);
+
+          if (!firstSnapshot && messageData.senderId !== currentUser.uid) {
+            playNotificationSound();
+          }
+        }
+
+        if (change.type === "modified") {
+          renderMessage(messageId, messageData);
+        }
+
+        if (change.type === "removed") {
+          removeMessage(messageId);
+        }
+      });
+
+      firstSnapshot = false;
+
+      scrollToBottom();
+    },
+    (error) => {
+      console.error("❌ Message listener error:", error);
+
+      showNotification("Unable to sync messages in real time.");
+    },
+  );
+}
+
+/* ==========================================
+   RENDER MESSAGE
+========================================== */
+
+function renderMessage(messageId, message) {
+  const existingRow = messageElements.get(messageId);
+
+  if (existingRow) {
+    existingRow.remove();
+    messageElements.delete(messageId);
+  }
+
+  const isOwnMessage = message.senderId === currentUser.uid;
+
+  const row = document.createElement("div");
+
+  row.className = `message-row ${isOwnMessage ? "you" : "friend"}`;
+
+  const bubble = document.createElement("div");
+
+  bubble.className = "message-bubble";
+
+  /* ----------------------------------------
+     SENDER
+  ---------------------------------------- */
+
+  const sender = document.createElement("div");
+
+  sender.className = "message-sender";
+
+  sender.textContent = message.senderName || message.senderId || "Unknown";
+
+  /* ----------------------------------------
+     MESSAGE TEXT
+  ---------------------------------------- */
+
+  const text = document.createElement("p");
+
+  text.className = "message-text";
+
+  text.textContent = message.text || "";
+
+  /* ----------------------------------------
+     META
+  ---------------------------------------- */
+
+  const meta = document.createElement("div");
+
+  meta.className = "message-meta";
+
+  const time = document.createElement("span");
+
+  time.textContent = formatTimestamp(message.timestamp);
+
+  meta.appendChild(time);
+
+  if (message.edited) {
+    const edited = document.createElement("span");
+
+    edited.className = "edited-label";
+
+    edited.textContent = "edited";
+
+    meta.appendChild(edited);
+  }
+
+  /* ----------------------------------------
+     OWN MESSAGE ACTIONS
+  ---------------------------------------- */
+
+  if (isOwnMessage) {
+    const actions = document.createElement("div");
+
+    actions.className = "message-actions";
+
+    /* EDIT */
+
+    const editButton = document.createElement("button");
+
+    editButton.type = "button";
+
+    editButton.className = "message-action edit";
+
+    editButton.textContent = "✎";
+
+    editButton.title = "Edit message";
+
+    editButton.setAttribute("aria-label", "Edit message");
+
+    editButton.addEventListener("click", () => {
+      startEditingMessage(messageId, message.text || "");
+    });
+
+    /* DELETE */
+
+    const deleteButton = document.createElement("button");
+
+    deleteButton.type = "button";
+
+    deleteButton.className = "message-action delete";
+
+    deleteButton.textContent = "×";
+
+    deleteButton.title = "Delete message";
+
+    deleteButton.setAttribute("aria-label", "Delete message");
+
+    deleteButton.addEventListener("click", () => {
+      deleteMessage(messageId);
+    });
+
+    actions.appendChild(editButton);
+    actions.appendChild(deleteButton);
+
+    bubble.appendChild(actions);
+  }
+
+  bubble.appendChild(sender);
+  bubble.appendChild(text);
+  bubble.appendChild(meta);
+
+  row.appendChild(bubble);
+
+  chatContainer.appendChild(row);
+
+  messageElements.set(messageId, row);
+}
+
+/* ==========================================
+   EMPTY CHAT
+========================================== */
+
+function renderEmptyChat() {
+  if (messageElements.size > 0) {
+    return;
+  }
+
+  if (document.querySelector(".empty-chat")) {
+    return;
+  }
+
+  const empty = document.createElement("div");
+
+  empty.className = "empty-chat";
+
+  const icon = document.createElement("div");
+
+  icon.className = "empty-chat-icon";
+  icon.textContent = "💬";
+
+  const heading = document.createElement("h2");
+
+  heading.textContent = "No messages yet";
+
+  const paragraph = document.createElement("p");
+
+  paragraph.textContent = "Start the chaos. Send the first message.";
+
+  empty.appendChild(icon);
+  empty.appendChild(heading);
+  empty.appendChild(paragraph);
+
+  chatContainer.appendChild(empty);
+}
+
+/* ==========================================
+   SEND / UPDATE MESSAGE
+========================================== */
+
+chatForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const text = messageInput.value.trim();
+
+  if (!text) {
+    return;
+  }
+
+  if (text.length > 1000) {
+    showNotification("Message cannot exceed 1000 characters.");
+    return;
+  }
+
+  if (editingMessageId) {
+    await updateMessage(editingMessageId, text);
+    return;
+  }
+
+  await sendMessage(text);
+});
+
+/* ==========================================
+   SEND NEW MESSAGE
+========================================== */
+
+async function sendMessage(text) {
+  setComposerLoading(true);
+
+  try {
+    const messagesRef = collection(db, "chats", CHAT_ID, "messages");
+
+    await addDoc(messagesRef, {
+      senderId: currentUser.uid,
+
+      senderName:
+        currentUserData.username ||
+        currentUserData.displayName ||
+        currentUser.email,
+
+      text,
+
+      type: "text",
+
+      edited: false,
+
+      timestamp: serverTimestamp(),
+    });
+
+    const chatRef = doc(db, "chats", CHAT_ID);
+
+    await updateDoc(chatRef, {
+      lastMessage: text,
+      lastMessageAt: serverTimestamp(),
+    });
+
+    messageInput.value = "";
+
+    updateCharacterCount();
+
+    scrollToBottom();
+  } catch (error) {
+    console.error("❌ Send message failed:", error);
+
+    showNotification("Message could not be sent.");
+  } finally {
+    setComposerLoading(false);
+    messageInput.focus();
+  }
+}
+
+/* ==========================================
+   START EDITING
+========================================== */
+
+function startEditingMessage(messageId, text) {
+  editingMessageId = messageId;
+  editingOriginalText = text;
+
+  messageInput.value = text;
+
+  messageInput.placeholder = "Edit your message...";
+
+  sendText.textContent = "Update";
+  sendIcon.textContent = "✓";
+
+  chatForm.classList.add("editing");
+
+  updateCharacterCount();
+
+  messageInput.focus();
+
+  /* Put cursor at the end */
+  messageInput.setSelectionRange(
+    messageInput.value.length,
+    messageInput.value.length,
+  );
+}
+
+/* ==========================================
+   UPDATE EXISTING MESSAGE
+========================================== */
+
+async function updateMessage(messageId, newText) {
+  /* Nothing changed */
+  if (newText === editingOriginalText) {
+    cancelEditing();
+    return;
+  }
+
+  setComposerLoading(true);
+
+  try {
+    const messageRef = doc(db, "chats", CHAT_ID, "messages", messageId);
+
+    await updateDoc(messageRef, {
+      text: newText,
+      edited: true,
+    });
+
+    showNotification("Message updated.");
+
+    cancelEditing();
+  } catch (error) {
+    console.error("❌ Edit message failed:", error);
+
+    showNotification("Message could not be updated.");
+  } finally {
+    setComposerLoading(false);
+
+    messageInput.focus();
+  }
+}
+
+/* ==========================================
+   CANCEL EDITING
+========================================== */
+
+function cancelEditing() {
+  editingMessageId = null;
+  editingOriginalText = "";
+
+  messageInput.value = "";
+
+  messageInput.placeholder = "Type something chaotic...";
+
+  sendText.textContent = "Send";
+  sendIcon.textContent = "↑";
+
+  chatForm.classList.remove("editing");
+
+  updateCharacterCount();
+}
+
+/* ==========================================
+   ESCAPE = CANCEL EDIT
+========================================== */
+
+messageInput.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && editingMessageId) {
+    cancelEditing();
+
+    showNotification("Edit cancelled.");
+
+    return;
+  }
+
+  /* Enter sends message */
+
+  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+    event.preventDefault();
+
+    chatForm.requestSubmit();
+  }
+});
+
+/* ==========================================
+   DELETE MESSAGE
+========================================== */
+
+async function deleteMessage(messageId) {
+  const confirmed = window.confirm("Delete this message?");
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    const messageRef = doc(db, "chats", CHAT_ID, "messages", messageId);
+
+    await deleteDoc(messageRef);
+
+    if (editingMessageId === messageId) {
+      cancelEditing();
     }
+
+    showNotification("Message deleted.");
+  } catch (error) {
+    console.error("❌ Delete message failed:", error);
+
+    showNotification("Message could not be deleted.");
+  }
+}
+
+/* ==========================================
+   CHARACTER COUNT
+========================================== */
+
+messageInput.addEventListener("input", updateCharacterCount);
+
+function updateCharacterCount() {
+  characterCount.textContent = `${messageInput.value.length}/1000`;
+}
+
+/* ==========================================
+   COMPOSER LOADING
+========================================== */
+
+function setComposerLoading(isLoading) {
+  sendBtn.disabled = isLoading;
+  messageInput.disabled = isLoading;
+}
+
+/* ==========================================
+   REMOVE MESSAGE
+========================================== */
+
+function removeMessage(messageId) {
+  const element = messageElements.get(messageId);
+
+  if (!element) {
+    return;
+  }
+
+  element.remove();
+
+  messageElements.delete(messageId);
+
+  if (messageElements.size === 0) {
+    renderEmptyChat();
+  }
+}
+
+/* ==========================================
+   TIMESTAMP
+========================================== */
+
+function formatTimestamp(timestamp) {
+  if (!timestamp) {
+    return "";
+  }
+
+  const date =
+    typeof timestamp.toDate === "function"
+      ? timestamp.toDate()
+      : new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
   });
-});
-
-// =================== NOTIFICATIONS ===================
-function showNotification(text) {
-  const notif = document.createElement("div");
-  notif.classList.add("notification");
-  notif.innerText = text;
-  notificationContainer.appendChild(notif);
-
-  setTimeout(() => notif.remove(), 3000);
 }
 
-// =================== GLOBAL CHAT BACKGROUND ===================
-const chatBgRef = doc(db, "chatSettings", "global");
+/* ==========================================
+   NOTIFICATION SOUND
+========================================== */
 
-onSnapshot(chatBgRef, (snap) => {
-  if (snap.exists()) {
-    const bgURL = snap.data().background;
-    if (bgURL) {
-      chatContainer.style.backgroundImage = `url(${bgURL})`;
-      chatContainer.style.backgroundSize = "cover";
-      chatContainer.style.backgroundPosition = "center";
-    }
-  }
-});
+function playNotificationSound() {
+  const audio = new Audio("sounds/ping.mp3");
 
-// Upload new background
-bgUploadInput.addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  audio.volume = 0.35;
 
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    chatContainer.style.backgroundImage = `url(${ev.target.result})`;
-    chatContainer.style.backgroundSize = "cover";
-    chatContainer.style.backgroundPosition = "center";
-  };
-  reader.readAsDataURL(file);
-
-  const storageRef = ref(storage, `chat-backgrounds/global-${Date.now()}`);
-  await uploadBytes(storageRef, file);
-  const downloadURL = await getDownloadURL(storageRef);
-
-  await updateDoc(chatBgRef, { background: downloadURL });
-});
-
-// =================== INITIALIZE BACKGROUND ===================
-async function loadInitialBackground() {
-  const snap = await getDoc(chatBgRef);
-  if (snap.exists()) {
-    const bgURL = snap.data().background;
-    if (bgURL) {
-      chatContainer.style.backgroundImage = `url(${bgURL})`;
-      chatContainer.style.backgroundSize = "cover";
-      chatContainer.style.backgroundPosition = "center";
-    }
-  }
+  audio.play().catch(() => {
+    /* Browser may block autoplay */
+  });
 }
-loadInitialBackground();
 
-// =================== HIDE LOADER ===================
-const loader = document.getElementById("loader");
-if (loader) loader.style.display = "none";
+/* ==========================================
+   NOTIFICATION
+========================================== */
 
-// Scroll to bottom initially
-chatContainer.scrollTop = chatContainer.scrollHeight;
+function showNotification(message) {
+  const notification = document.createElement("div");
+
+  notification.className = "notification";
+
+  notification.textContent = message;
+
+  notificationContainer.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3200);
+}
+
+/* ==========================================
+   SCROLL
+========================================== */
+
+function scrollToBottom() {
+  requestAnimationFrame(() => {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  });
+}
+
+/* ==========================================
+   BACK BUTTON
+========================================== */
+
+backBtn.addEventListener("click", () => {
+  window.location.replace("index.html");
+});
+
+/* ==========================================
+   THEME
+========================================== */
+
+const savedMode = localStorage.getItem("mode");
+
+if (savedMode === "light") {
+  document.body.classList.add("light");
+  modeToggle.textContent = "🌙";
+} else {
+  modeToggle.textContent = "☀️";
+}
+
+modeToggle.addEventListener("click", () => {
+  const isLight = document.body.classList.toggle("light");
+
+  localStorage.setItem("mode", isLight ? "light" : "dark");
+
+  modeToggle.textContent = isLight ? "🌙" : "☀️";
+});
+
+/* ==========================================
+   LOADER
+========================================== */
+
+function hideLoader() {
+  loader.classList.add("hidden");
+}

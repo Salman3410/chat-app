@@ -1,29 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>3Chat Login - Funky</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bungee&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="login.css" />
-  </head>
-  <body>
-    <div class="login-container">
-      <div class="login-card">
-        <h1>💬 3Chat Login</h1>
-        <input type="text" id="username" placeholder="Enter username" />
 
-        <div class="password-wrapper">
-          <input type="password" id="password" placeholder="Enter password" />
-          <span id="togglePassword" class="toggle-password">👁️</span>
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>3Chat — Login</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="login.css"
+  />
+</head>
+
+<body>
+
+  <div class="background-shape shape-one"></div>
+  <div class="background-shape shape-two"></div>
+  <div class="background-grid"></div>
+
+  <main class="login-container">
+
+    <section class="login-card">
+
+      <div class="brand">
+
+        <div class="brand-icon">
+          3
         </div>
 
-        <button id="loginBtn">Login</button>
-      </div>
-    </div>
+        <div>
+          <h1>3Chat</h1>
 
-    <script src="login.js"></script>
-  </body>
+          <span>
+            Talk. Connect. Repeat.
+          </span>
+        </div>
+
+      </div>
+
+
+      <div class="login-heading">
+
+        <p class="eyebrow">
+          WELCOME BACK
+        </p>
+
+        <h2>
+          Let's get you chatting.
+        </h2>
+
+        <p class="login-description">
+          Sign in to continue to your conversations.
+        </p>
+
+      </div>
+
+
+      <form id="loginForm">
+
+        <!-- EMAIL -->
+
+        <div class="input-group">
+
+          <label for="email">
+            Email
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              ✉️
+            </span>
+
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              autocomplete="email"
+              required
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="input-group">
+
+          <label for="password">
+            Password
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              🔒
+            </span>
+
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            />
+
+            <button
+              type="button"
+              id="togglePassword"
+              class="password-toggle"
+              aria-label="Show password"
+            >
+              👁
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <p
+          id="loginMessage"
+          class="login-message"
+          aria-live="polite"
+        ></p>
+
+
+        <!-- LOGIN -->
+
+        <button
+          type="submit"
+          id="loginBtn"
+          class="login-button"
+        >
+
+          <span>
+            Enter 3Chat
+          </span>
+
+          <span class="button-arrow">
+            →
+          </span>
+
+        </button>
+
+      </form>
+
+
+      <div class="login-footer">
+
+        <span>
+          ⚡ Welcome back to the chaos
+        </span>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script
+    type="module"
+    src="login.js"
+  ></script>
+
+</body>
 </html>

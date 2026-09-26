@@ -1,91 +1,510 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>3Chat - Funky Friends</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bungee&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="loader" class="loader">
-      <div class="spinner"></div>
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
+  <title>3Chat — Friends</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  />
+</head>
+
+<body>
+
+  <!-- ==========================================
+       BACKGROUND
+  =========================================== -->
+
+  <div
+    class="background-grid"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="background-glow glow-pink"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="background-glow glow-cyan"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="background-glow glow-purple"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- ==========================================
+       LOADER
+  =========================================== -->
+
+  <div
+    id="loader"
+    class="loader"
+    aria-hidden="true"
+  >
+
+    <div class="loader-box">
+
+      <div
+        class="spinner"
+        aria-hidden="true"
+      ></div>
+
+      <span>
+        Loading 3Chat...
+      </span>
+
     </div>
 
-    <header>
-      <button id="modeToggle">🌙</button>
-      💬 3Chat - Funky Friends 💬
-      <span id="usernameDisplay"></span>
-      <button class="logout-btn" onclick="logout()">Logout ⬅</button>
-    </header>
+  </div>
 
-    <h1>Welcome to the Chaos Hub ⚡</h1>
-    <p>Just us 3 legends chatting forever 🚀</p>
-    <button onclick="enterChat()">Chat</button>
 
-    <div class="friends">
-      <div class="friend" onclick="goToProfile('Sam')">
-        <img src="avatars/Sam.png" alt="Sam" class="avatar" /><br />
-        Sam <br />
-        Coder of Doom <br />
-        <span class="status" id="status-Sam">Online</span>
+  <!-- ==========================================
+       HEADER
+  =========================================== -->
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <div
+        class="brand-icon"
+        aria-hidden="true"
+      >
+        3
       </div>
-      <div class="friend" onclick="goToProfile('Abcd')">
-        <img src="avatars/abcd.png" alt="Abcd" class="avatar" /><br />
-        Problem Solver <br />
-        <span class="status" id="status-Sam">Busy</span>
+
+      <div class="brand-copy">
+
+        <h1>3Chat</h1>
+
+        <span>
+          Funky Friends
+        </span>
+
       </div>
-      <div class="friend" onclick="goToProfile('Efgh')">
-        <img src="avatars/efgh.jpeg" alt="Efgh" class="avatar" /><br />
-        Meme <br />
-        <span class="status" id="status-Sam">Sleeping</span>
-      </div>
+
     </div>
 
-    <footer>Made with 💜 by 3 friends who talk too much.</footer>
 
-    <script>
-      const loggedInUser = localStorage.getItem("loggedInUser");
-      const usernameDisplay = document.getElementById("usernameDisplay");
+    <div class="header-actions">
 
-      if (!loggedInUser) window.location.href = "login.html";
-      else {
-        usernameDisplay.innerText = `👤 ${loggedInUser}`;
-        usernameDisplay.style.marginLeft = "15px";
-        usernameDisplay.style.fontWeight = "bold";
-      }
+      <div
+        id="usernameDisplay"
+        class="user-chip"
+        aria-label="Logged in user"
+      ></div>
 
-      function goToProfile(name) {
-        window.location.href = `profile.html?name=${name}`;
-      }
+      <button
+        id="modeToggle"
+        class="icon-btn"
+        type="button"
+        aria-label="Toggle light and dark mode"
+        title="Toggle theme"
+      >
+        🌙
+      </button>
 
-      function enterChat() {
-        window.location.href = "chat.html";
-      }
+      <button
+        id="logoutBtn"
+        class="logout-btn"
+        type="button"
+      >
+        Logout
+      </button>
 
-      function logout() {
-        localStorage.removeItem("loggedInUser");
-        window.location.href = "login.html";
-      }
-    </script>
+    </div>
 
-    <script>
-      const toggleBtn = document.getElementById("modeToggle");
+  </header>
 
-      // Load saved mode from localStorage
-      if (localStorage.getItem("mode") === "dark") {
-        document.body.classList.add("dark");
-        toggleBtn.innerText = "☀️";
-      }
 
-      toggleBtn.addEventListener("click", () => {
-        document.body.classList.toggle("dark");
-        const isDark = document.body.classList.contains("dark");
-        toggleBtn.innerText = isDark ? "☀️" : "🌙";
-        localStorage.setItem("mode", isDark ? "dark" : "light");
-      });
-    </script>
-  </body>
+  <!-- ==========================================
+       MAIN
+  =========================================== -->
+
+  <main class="home-page">
+
+
+    <!-- ========================================
+         HERO
+    ========================================= -->
+
+    <section
+      class="hero-section"
+      aria-labelledby="hero-title"
+    >
+
+      <div class="hero-badge">
+        ⚡ CHAOS HUB
+      </div>
+
+      <h2 id="hero-title">
+
+        Welcome to the
+
+        <span>
+          Chaos Hub.
+        </span>
+
+      </h2>
+
+      <p>
+        Three legends. One chat.
+        Absolutely no peace.
+      </p>
+
+      <button
+        id="chatBtn"
+        class="primary-btn"
+        type="button"
+      >
+
+        <span>
+          Open Group Chat
+        </span>
+
+        <span
+          class="arrow"
+          aria-hidden="true"
+        >
+          →
+        </span>
+
+      </button>
+
+    </section>
+
+
+    <!-- ========================================
+         FRIENDS
+    ========================================= -->
+
+    <section
+      class="friends-section"
+      aria-labelledby="friends-title"
+    >
+
+      <div class="section-header">
+
+        <div>
+
+          <p class="section-eyebrow">
+            THE CREW
+          </p>
+
+          <h3 id="friends-title">
+            Your people
+          </h3>
+
+        </div>
+
+        <span class="friend-count">
+          3 friends
+        </span>
+
+      </div>
+
+
+      <div class="friends">
+
+
+        <!-- ====================================
+             SAM
+        ===================================== -->
+
+        <article
+          class="friend-card"
+          data-name="Sam"
+          tabindex="0"
+          role="button"
+          aria-label="Open Sam's profile"
+        >
+
+          <div class="avatar-wrapper">
+
+            <img
+              src="avatars/Sam.png"
+              alt="Sam"
+              class="avatar"
+              loading="lazy"
+            />
+
+            <span
+              class="online-dot"
+              aria-label="Online"
+            ></span>
+
+          </div>
+
+
+          <div class="friend-info">
+
+            <h4>
+              Sam
+            </h4>
+
+            <p>
+              Coder of Doom
+            </p>
+
+          </div>
+
+
+          <div class="friend-footer">
+
+            <span class="status online">
+
+              <span
+                class="status-dot"
+                aria-hidden="true"
+              ></span>
+
+              Online
+
+            </span>
+
+            <span
+              class="profile-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
+
+          </div>
+
+        </article>
+
+
+        <!-- ====================================
+             ARSH
+        ===================================== -->
+
+        <article
+          class="friend-card"
+          data-name="Arsh"
+          tabindex="0"
+          role="button"
+          aria-label="Open Arsh's profile"
+        >
+
+          <div class="avatar-wrapper">
+
+            <img
+              src="avatars/arsh.png"
+              alt="Arsh"
+              class="avatar"
+              loading="lazy"
+            />
+
+            <span
+              class="online-dot busy"
+              aria-label="Busy"
+            ></span>
+
+          </div>
+
+
+          <div class="friend-info">
+
+            <h4>
+              Arsh
+            </h4>
+
+            <p>
+              Problem Solver
+            </p>
+
+          </div>
+
+
+          <div class="friend-footer">
+
+            <span class="status busy">
+
+              <span
+                class="status-dot"
+                aria-hidden="true"
+              ></span>
+
+              Busy
+
+            </span>
+
+            <span
+              class="profile-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
+
+          </div>
+
+        </article>
+
+
+        <!-- ====================================
+             MOHSIN
+        ===================================== -->
+
+        <article
+          class="friend-card"
+          data-name="Mohsin"
+          tabindex="0"
+          role="button"
+          aria-label="Open Mohsin's profile"
+        >
+
+          <div class="avatar-wrapper">
+
+            <img
+              src="avatars/mohsin.jpeg"
+              alt="Mohsin"
+              class="avatar"
+              loading="lazy"
+            />
+
+            <span
+              class="online-dot sleeping"
+              aria-label="Sleeping"
+            ></span>
+
+          </div>
+
+
+          <div class="friend-info">
+
+            <h4>
+              Mohsin
+            </h4>
+
+            <p>
+              Professional Meme Dealer
+            </p>
+
+          </div>
+
+
+          <div class="friend-footer">
+
+            <span class="status sleeping">
+
+              <span
+                class="status-dot"
+                aria-hidden="true"
+              ></span>
+
+              Sleeping
+
+            </span>
+
+            <span
+              class="profile-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
+
+          </div>
+
+        </article>
+
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         QUICK CHAT
+    ========================================= -->
+
+    <section
+      class="quick-section"
+      aria-label="Quick chat"
+    >
+
+      <div class="quick-card">
+
+        <div
+          class="quick-icon"
+          aria-hidden="true"
+        >
+          💬
+        </div>
+
+
+        <div class="quick-content">
+
+          <h4>
+            Need to say something?
+          </h4>
+
+          <p>
+            Jump straight into the
+            group conversation.
+          </p>
+
+        </div>
+
+
+        <button
+          id="quickChatBtn"
+          class="quick-btn"
+          type="button"
+        >
+          Chat →
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ==========================================
+       FOOTER
+  =========================================== -->
+
+  <footer>
+
+    <span>
+      Made with 💜 by 3 friends
+      who talk way too much.
+    </span>
+
+    <span class="footer-version">
+      3Chat v1.0
+    </span>
+
+  </footer>
+
+
+  <!-- ==========================================
+       JAVASCRIPT
+  =========================================== -->
+
+  <script
+    type="module"
+    src="index.js"
+  ></script>
+
+</body>
+
 </html>

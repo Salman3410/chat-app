@@ -1,223 +1,864 @@
-/* =================== VARIABLES =================== */
 :root {
-  --bg-gradient: linear-gradient(135deg, #ff00c8, #00ffe7);
-  --text-color: white;
-  --header-bg: rgba(0, 0, 0, 0.4);
-  --button-bg: yellow;
-  --button-hover: #ffea00;
-  --friend-bg: rgba(255, 255, 255, 0.1);
-  --friend-bg-hover: rgba(255, 255, 255, 0.2);
-  --avatar-border: yellow;
-  --footer-bg: rgba(0, 0, 0, 0.5);
-  --spinner-color: yellow;
-  --message-bg-you: yellow;
-  --message-bg-friend: rgba(255, 255, 255, 0.3);
-  --notification-bg: yellow;
-  --notification-text: black;
+  --bg: #090912;
+
+  --card: rgba(18, 18, 31, 0.82);
+  --card-hover: rgba(25, 25, 43, 0.92);
+
+  --text: #ffffff;
+  --muted: #9696ad;
+  --soft-text: #c9c9d8;
+
+  --pink: #ff3cac;
+  --purple: #784cff;
+  --cyan: #00e5ff;
+  --yellow: #ffe66d;
+
+  --green: #66f2a4;
+  --orange: #ff9a62;
+  --sleeping: #9a8cff;
+
+  --border: rgba(255, 255, 255, 0.09);
+
+  --radius-lg: 26px;
+  --radius-md: 17px;
+
+  --shadow:
+    0 25px 70px rgba(0, 0, 0, 0.38);
 }
 
-body.dark {
-  --bg-gradient: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-  --text-color: #ffffff;
-  --header-bg: rgba(0, 0, 0, 0.8);
-  --button-bg: #ffcc00;
-  --button-hover: #ffe600;
-  --friend-bg: rgba(50, 50, 50, 0.5);
-  --friend-bg-hover: rgba(255, 255, 255, 0.2);
-  --avatar-border: #ffe600;
-  --footer-bg: rgba(0, 0, 0, 0.8);
-  --spinner-color: #ffe600;
-  --message-bg-you: #ffcc00;
-  --message-bg-friend: rgba(50, 50, 50, 0.5);
-  --notification-bg: #ffcc00;
-  --notification-text: black;
+body.light {
+  --bg: #f4f3fa;
+
+  --card: rgba(255, 255, 255, 0.82);
+  --card-hover: rgba(255, 255, 255, 0.97);
+
+  --text: #181824;
+  --muted: #6f6f82;
+  --soft-text: #444454;
+
+  --border: rgba(20, 20, 40, 0.09);
+
+  --shadow:
+    0 20px 50px rgba(35, 30, 70, 0.12);
 }
 
-/* =================== BODY =================== */
+* {
+  box-sizing: border-box;
+}
+
+html,
 body {
   margin: 0;
-  font-family: "Bungee", cursive;
-  background: var(--bg-gradient);
-  color: var(--text-color);
-  text-align: center;
-  overflow-x: hidden;
+  min-height: 100%;
+}
+
+body {
   min-height: 100vh;
-  transition: all 0.3s;
-}
 
-/* =================== HEADER =================== */
-header {
-  padding: 20px;
-  font-size: 28px;
-  background: var(--header-bg);
-  transition: background 0.3s;
-}
-
-/* =================== TITLES & PARAGRAPH =================== */
-h1 {
-  font-size: 60px;
-  margin: 40px 0 10px;
-  text-shadow: 2px 2px #000;
-}
-p {
-  font-size: 18px;
-  margin-bottom: 20px;
-}
-
-/* =================== BUTTONS =================== */
-button {
-  padding: 15px 30px;
-  font-size: 20px;
-  border: none;
-  border-radius: 50px;
-  background: var(--button-bg);
-  color: black;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  transform: scale(1.1) rotate(-3deg);
-  background: var(--button-hover);
-}
-
-/* =================== FRIENDS =================== */
-.friends {
   display: flex;
-  justify-content: center;
-  margin: 50px;
-  gap: 30px;
-  flex-wrap: wrap;
+  flex-direction: column;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  background: var(--bg);
+
+  color: var(--text);
+
+  overflow-x: hidden;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
-.friend {
-  display: inline-block;
-  text-align: center;
-  padding: 15px;
-  border-radius: 20px;
-  background: var(--friend-bg);
-  cursor: pointer;
-  transition: transform 0.5s, box-shadow 0.5s, background 0.3s;
-  font-family: "Bungee", cursive;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  position: relative;
-  min-width: 120px;
-  max-width: 150px;
+/* ==============================
+   BACKGROUND
+================================ */
+
+.background-grid {
+  position: fixed;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    );
+
+  background-size: 45px 45px;
+
+  pointer-events: none;
 }
 
-.friend img.avatar {
-  width: 80px;
-  height: 80px;
+.background-glow {
+  position: fixed;
+
+  width: 340px;
+  height: 340px;
+
   border-radius: 50%;
-  border: 3px solid var(--avatar-border);
-  margin-bottom: 10px;
-  transition: transform 0.5s;
+
+  filter: blur(115px);
+
+  opacity: 0.22;
+
+  pointer-events: none;
+
+  transition: opacity 0.3s ease;
 }
 
-.friend:hover {
-  transform: scale(1.1) rotate(-5deg);
-  background: var(--friend-bg-hover);
-  box-shadow: 0 0 25px var(--avatar-border), 0 0 15px #ffea00 inset;
+.glow-pink {
+  top: -140px;
+  left: -120px;
+
+  background: var(--pink);
 }
 
-.friend:hover img.avatar {
-  transform: rotate(20deg) scale(1.15);
+.glow-cyan {
+  right: -140px;
+  bottom: -130px;
+
+  background: var(--cyan);
 }
 
-.friend:hover::before {
-  content: "✨";
-  position: absolute;
-  font-size: 24px;
-  top: -10px;
+.glow-purple {
+  top: 40%;
   left: 50%;
-  transform: translateX(-50%) rotate(15deg);
-  animation: sparkle 1s infinite alternate;
+
+  transform: translate(-50%, -50%);
+
+  background: var(--purple);
+
+  opacity: 0.08;
 }
 
-@keyframes sparkle {
-  0% {
-    transform: translateX(-50%) rotate(0deg) scale(1);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translateX(-50%) rotate(15deg) scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-50%) rotate(-10deg) scale(1);
-    opacity: 0.7;
-  }
+body.light .background-glow {
+  opacity: 0.13;
 }
 
-/* =================== FOOTER =================== */
-footer {
-  position: relative;
-  bottom: 0;
-  width: 100%;
-  font-size: 14px;
-  background: var(--footer-bg);
-  padding: 10px;
-  transition: background 0.3s;
+/* ==============================
+   HEADER
+================================ */
+
+.topbar {
+  min-height: 74px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 28px;
+
+  background: rgba(10, 10, 18, 0.72);
+
+  border-bottom: 1px solid var(--border);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  position: sticky;
+  top: 0;
+
+  z-index: 50;
 }
 
-/* =================== EMOJIS =================== */
-.emoji {
-  position: absolute;
-  font-size: 2rem;
-  animation: floatUp 6s linear infinite;
-  opacity: 0.8;
+body.light .topbar {
+  background: rgba(255, 255, 255, 0.74);
 }
 
-@keyframes floatUp {
-  0% {
-    transform: translateY(100vh) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-10vh) scale(1.5);
-    opacity: 0;
-  }
+/* ==============================
+   BRAND
+================================ */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
 }
 
-/* =================== LOGOUT & USER =================== */
+.brand-icon {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--pink),
+      var(--purple)
+    );
+
+  color: white;
+
+  font-family: "Bungee", sans-serif;
+
+  font-size: 22px;
+
+  transform: rotate(-6deg);
+
+  box-shadow:
+    0 10px 30px rgba(255, 60, 172, 0.22);
+}
+
+.brand-copy h1 {
+  margin: 0;
+
+  font-family: "Bungee", sans-serif;
+
+  font-size: 21px;
+}
+
+.brand-copy span {
+  color: var(--muted);
+
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 0.8px;
+}
+
+/* ==============================
+   HEADER ACTIONS
+================================ */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+}
+
+.user-chip {
+  padding: 9px 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  border: 1px solid var(--border);
+
+  color: var(--soft-text);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.icon-btn,
 .logout-btn {
-  float: right;
-  margin-top: -5px;
-  padding: 8px 15px;
-  font-size: 16px;
-  border: none;
-  border-radius: 20px;
-  background: var(--button-bg);
-  color: black;
+  height: 40px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
   cursor: pointer;
-  transition: 0.3s;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.logout-btn:hover {
-  transform: scale(1.1) rotate(-5deg);
-  background: var(--button-hover);
-}
+.icon-btn {
+  width: 40px;
 
-#usernameDisplay {
+  background: rgba(255, 255, 255, 0.045);
+
   font-size: 16px;
-  color: var(--avatar-border);
 }
 
-/* =================== LOADER =================== */
+.logout-btn {
+  padding: 0 15px;
+
+  background: transparent;
+
+  color: var(--soft-text);
+
+  font-family: inherit;
+
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.icon-btn:hover,
+.logout-btn:hover {
+  transform: translateY(-2px);
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* ==============================
+   HOME
+================================ */
+
+.home-page {
+  width: min(1120px, 100%);
+
+  margin: 0 auto;
+
+  padding: 65px 24px 50px;
+
+  position: relative;
+  z-index: 1;
+}
+
+/* ==============================
+   HERO
+================================ */
+
+.hero-section {
+  text-align: center;
+
+  max-width: 760px;
+
+  margin: 0 auto 76px;
+
+  animation: fadeUp 0.65s ease;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 8px 13px;
+
+  margin-bottom: 20px;
+
+  border-radius: 999px;
+
+  border: 1px solid rgba(0, 229, 255, 0.14);
+
+  background: rgba(0, 229, 255, 0.05);
+
+  color: var(--cyan);
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 1.7px;
+}
+
+.hero-section h2 {
+  margin: 0;
+
+  font-family: "Bungee", sans-serif;
+
+  font-size: clamp(38px, 6vw, 70px);
+
+  line-height: 1.08;
+
+  letter-spacing: -1px;
+}
+
+.hero-section h2 span {
+  display: block;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--pink),
+      var(--purple),
+      var(--cyan)
+    );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-section p {
+  margin: 19px auto 28px;
+
+  max-width: 520px;
+
+  color: var(--muted);
+
+  font-size: 16px;
+
+  line-height: 1.6;
+}
+
+/* ==============================
+   PRIMARY BUTTON
+================================ */
+
+.primary-btn {
+  height: 56px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 0 8px 0 20px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      110deg,
+      var(--pink),
+      var(--purple)
+    );
+
+  color: white;
+
+  font-family: "Bungee", sans-serif;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 15px 40px rgba(120, 76, 255, 0.25);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.primary-btn .arrow {
+  width: 39px;
+  height: 39px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.13);
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 20px;
+}
+
+.primary-btn:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 20px 45px rgba(120, 76, 255, 0.38);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+/* ==============================
+   SECTION HEADER
+================================ */
+
+.friends-section {
+  animation: fadeUp 0.8s ease;
+}
+
+.section-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.section-eyebrow {
+  margin: 0 0 5px;
+
+  color: var(--pink);
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+.section-header h3 {
+  margin: 0;
+
+  font-size: 24px;
+}
+
+.friend-count {
+  color: var(--muted);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ==============================
+   FRIENDS
+================================ */
+
+.friends {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+.friend-card {
+  min-width: 0;
+
+  padding: 22px;
+
+  border-radius: var(--radius-lg);
+
+  border: 1px solid var(--border);
+
+  background: var(--card);
+
+  box-shadow: var(--shadow);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.friend-card:hover,
+.friend-card:focus-visible {
+  outline: none;
+
+  transform: translateY(-7px);
+
+  background: var(--card-hover);
+
+  border-color: rgba(255, 60, 172, 0.22);
+
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.35),
+    0 0 35px rgba(255, 60, 172, 0.07);
+}
+
+.friend-card:nth-child(2):hover,
+.friend-card:nth-child(2):focus-visible {
+  border-color: rgba(120, 76, 255, 0.3);
+}
+
+.friend-card:nth-child(3):hover,
+.friend-card:nth-child(3):focus-visible {
+  border-color: rgba(0, 229, 255, 0.24);
+}
+
+/* ==============================
+   AVATAR
+================================ */
+
+.avatar-wrapper {
+  position: relative;
+
+  width: 78px;
+  height: 78px;
+
+  margin-bottom: 18px;
+}
+
+.avatar {
+  width: 78px;
+  height: 78px;
+
+  object-fit: cover;
+
+  border-radius: 23px;
+
+  border: 2px solid rgba(255, 255, 255, 0.11);
+
+  display: block;
+}
+
+.online-dot {
+  position: absolute;
+
+  right: -2px;
+  bottom: -2px;
+
+  width: 19px;
+  height: 19px;
+
+  border-radius: 50%;
+
+  background: var(--green);
+
+  border: 4px solid #12121f;
+
+  box-shadow:
+    0 0 14px rgba(102, 242, 164, 0.5);
+}
+
+.online-dot.busy {
+  background: var(--orange);
+
+  box-shadow:
+    0 0 14px rgba(255, 154, 98, 0.45);
+}
+
+.online-dot.sleeping {
+  background: var(--sleeping);
+
+  box-shadow:
+    0 0 14px rgba(154, 140, 255, 0.45);
+}
+
+body.light .online-dot {
+  border-color: white;
+}
+
+/* ==============================
+   FRIEND INFO
+================================ */
+
+.friend-info h4 {
+  margin: 0;
+
+  font-size: 21px;
+}
+
+.friend-info p {
+  margin: 5px 0 20px;
+
+  color: var(--muted);
+
+  font-size: 13px;
+}
+
+/* ==============================
+   FRIEND FOOTER
+================================ */
+
+.friend-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  color: var(--muted);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+.status.online {
+  color: var(--green);
+}
+
+.status.busy {
+  color: var(--orange);
+}
+
+.status.sleeping {
+  color: var(--sleeping);
+}
+
+.profile-arrow {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  color: var(--soft-text);
+
+  font-size: 17px;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.friend-card:hover .profile-arrow {
+  transform: translateX(3px);
+
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* ==============================
+   QUICK ACTION
+================================ */
+
+.quick-section {
+  margin-top: 48px;
+
+  animation: fadeUp 1s ease;
+}
+
+.quick-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+
+  padding: 20px;
+
+  border-radius: var(--radius-lg);
+
+  border: 1px solid var(--border);
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255, 60, 172, 0.07),
+      rgba(120, 76, 255, 0.06)
+    );
+}
+
+.quick-icon {
+  width: 50px;
+  height: 50px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  font-size: 22px;
+}
+
+.quick-content {
+  flex: 1;
+}
+
+.quick-content h4 {
+  margin: 0;
+
+  font-size: 15px;
+}
+
+.quick-content p {
+  margin: 4px 0 0;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+.quick-btn {
+  height: 42px;
+
+  padding: 0 15px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  color: var(--soft-text);
+
+  font-family: inherit;
+
+  font-weight: 600;
+  font-size: 12px;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.quick-btn:hover {
+  transform: translateX(3px);
+
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* ==============================
+   FOOTER
+================================ */
+
+footer {
+  margin-top: auto;
+
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+
+  padding: 12px 20px;
+
+  color: var(--muted);
+
+  font-size: 11px;
+
+  border-top: 1px solid var(--border);
+
+  background: rgba(8, 8, 15, 0.35);
+}
+
+.footer-version {
+  opacity: 0.55;
+}
+
+/* ==============================
+   LOADER
+================================ */
+
 .loader {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
+  background: rgba(9, 9, 18, 0.72);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
   z-index: 9999;
+
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.3s;
+
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease;
 }
 
 .loader.active {
@@ -225,201 +866,177 @@ footer {
   opacity: 1;
 }
 
+.loader-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 13px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
 .spinner {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid var(--spinner-color);
+  width: 46px;
+  height: 46px;
+
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
+
+  border: 4px solid rgba(255, 255, 255, 0.1);
+
+  border-top-color: var(--pink);
+  border-right-color: var(--cyan);
+
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+  to {
     transform: rotate(360deg);
   }
 }
 
-/* =================== NOTIFICATIONS =================== */
-#notification-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
-}
+/* ==============================
+   ENTRY ANIMATION
+================================ */
 
-.notification {
-  background: var(--notification-bg);
-  color: var(--notification-text);
-  padding: 10px 20px;
-  margin-bottom: 10px;
-  border-radius: 20px;
-  font-family: "Bungee", cursive;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
-}
-
-@keyframes slideIn {
-  0% {
-    transform: translateX(100%);
+@keyframes fadeUp {
+  from {
     opacity: 0;
+    transform: translateY(20px);
   }
-  100% {
-    transform: translateX(0);
+
+  to {
     opacity: 1;
-  }
-}
-@keyframes fadeOut {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
+    transform: translateY(0);
   }
 }
 
-/* =================== CHAT MESSAGES =================== */
-.message {
-  margin: 10px;
-  padding: 10px 15px;
-  border-radius: 20px;
-  max-width: 70%;
-  word-wrap: break-word;
-}
+/* ==============================
+   MOBILE
+================================ */
 
-.message.you {
-  background: var(--message-bg-you);
-  color: black;
-  align-self: flex-end;
-}
+@media (max-width: 850px) {
 
-.message.friend {
-  background: var(--message-bg-friend);
-  color: white;
-  align-self: flex-start;
-}
-
-.chat-input {
-  display: flex;
-  gap: 10px;
-  margin: 15px;
-}
-
-#messageInput {
-  flex: 1;
-  padding: 10px;
-  border-radius: 15px;
-  border: none;
-}
-
-.status {
-  display: block;
-  margin-top: 5px;
-  font-size: 14px;
-  font-style: italic;
-  color: #ffeb3b;
-  text-shadow: 1px 1px 2px black;
-  transition: all 0.3s;
-}
-.status.online {
-  color: #00ff00;
-  animation: pulse 1.5s infinite;
-}
-.status.busy {
-  color: #ff8000;
-  animation: pulse 1.5s infinite;
-}
-.status.sleeping {
-  color: #8888ff;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
+  .topbar {
+    padding: 12px 18px;
   }
-  50% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-}
 
-.action-btn {
-  background: yellow;
-  border: none;
-  border-radius: 10px;
-  padding: 3px 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.3s;
-}
-.action-btn:hover {
-  transform: scale(1.2) rotate(-5deg);
-  background: #ffea00;
-}
-
-/* =================== MOBILE RESPONSIVE =================== */
-@media screen and (max-width: 768px) {
-  h1 {
-    font-size: 40px;
-  }
-  p {
-    font-size: 16px;
-  }
   .friends {
-    margin: 20px;
-    gap: 15px;
+    grid-template-columns: 1fr;
   }
-  .friend {
-    min-width: 100px;
-    max-width: 120px;
-    padding: 10px;
+
+  .friend-card {
+    display: grid;
+
+    grid-template-columns: auto 1fr auto;
+
+    align-items: center;
+
+    column-gap: 16px;
   }
-  .friend img.avatar {
-    width: 60px;
-    height: 60px;
+
+  .avatar-wrapper {
+    margin: 0;
   }
-  .chat-container {
-    max-height: 300px;
-    margin: 10px;
-    padding: 8px;
+
+  .friend-info p {
+    margin-bottom: 0;
   }
-  #messageInput {
-    padding: 8px;
-    font-size: 14px;
-  }
-  .chat-input button {
-    padding: 8px 15px;
-    font-size: 14px;
-  }
-  header {
-    font-size: 22px;
-    padding: 15px;
+
+  .friend-footer {
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 10px;
   }
 }
 
-@media screen and (max-width: 480px) {
-  h1 {
-    font-size: 32px;
+@media (max-width: 600px) {
+
+  .brand-copy {
+    display: none;
   }
-  .friend {
-    min-width: 90px;
-    max-width: 100px;
-    padding: 8px;
+
+  .home-page {
+    padding: 42px 15px 40px;
   }
-  .friend img.avatar {
-    width: 50px;
-    height: 50px;
+
+  .hero-section {
+    margin-bottom: 52px;
   }
-  .chat-container {
-    max-height: 250px;
+
+  .hero-section h2 {
+    font-size: 39px;
   }
+
+  .hero-section p {
+    font-size: 14px;
+  }
+
+  .user-chip {
+    max-width: 125px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+  }
+
+  .logout-btn {
+    padding: 0 11px;
+  }
+
+  .quick-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .quick-content {
+    min-width: calc(100% - 70px);
+  }
+
+  .quick-btn {
+    width: 100%;
+  }
+
+  footer {
+    flex-direction: column;
+
+    gap: 4px;
+
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px) {
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .user-chip {
+    display: none;
+  }
+
+  .hero-section h2 {
+    font-size: 34px;
+  }
+
+  .friend-card {
+    padding: 18px;
+  }
+
+  .friend-info h4 {
+    font-size: 18px;
+  }
+
+  .friend-info p {
+    font-size: 12px;
+  }
+
 }
